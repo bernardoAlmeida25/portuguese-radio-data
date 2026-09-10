@@ -1,0 +1,18 @@
+# Virtual environment
+.venv/
+
+# Tool cache
+.ruff_cache/
+
+# LibreOffice/Excel lock files (created while the file is open locally)
+.~lock.*#
+
+# Scraper output — generated data, not source
+radio_tracks.xlsx
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment/secrets, if any (e.g. API keys)
+.env

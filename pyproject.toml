@@ -1,0 +1,19 @@
+[project]
+name = "radios-estudo"
+version = "0.1.0"
+description = "Web scraper for Rádio Comercial play history"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "openpyxl>=3.1.5",
+    "requests>=2.32.5",
+    "ruff>=0.6.7",
+    "selenium>=4.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "double"
