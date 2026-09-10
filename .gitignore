@@ -17,3 +17,4 @@ __pycache__/
 
 # Environment/secrets, if any (e.g. API keys)
 .env
+.DS_Store
