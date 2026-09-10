@@ -1,4 +1,4 @@
-# radios-estudo
+# Portuguese Radio's Data
 
 A small scraper that collects "now playing" history from Portuguese radio stations and appends it to a single Excel file (`radio_tracks.xlsx`). Built as a data-collection step for a larger open-data project on Portugal.
 

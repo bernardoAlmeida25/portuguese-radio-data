@@ -1,5 +1,6 @@
 # Virtual environment
 .venv/
+.DS_Store
 
 # Tool cache
 .ruff_cache/
