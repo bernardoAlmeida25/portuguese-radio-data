@@ -9,7 +9,6 @@
 .~lock.*#
 
 # Scraper output — generated data, not source
-radio_tracks.xlsx
 
 # Python
 __pycache__/
