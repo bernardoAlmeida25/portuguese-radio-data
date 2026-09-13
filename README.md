@@ -1,6 +1,10 @@
-# Portuguese Radio's Data
+# Portuguese Radio Airplay Data
 
-A small scraper that collects "now playing" history from Portuguese radio stations and appends it to a single Excel file (`radio_tracks.xlsx`). Built as a data-collection step for a larger open-data project on Portugal.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Data](https://img.shields.io/badge/data-daily%20updates-brightgreen)
+
+An open dataset and scraper tracking which songs are played, and when, on major Portuguese radio stations (RFM, Mega Hits, Rádio Comercial). Updated daily. Part of a broader effort to build open datasets about Portugal, inspired by [Central de Dados](https://github.com/centraldedados).
 
 ## What it does
 
@@ -13,6 +17,14 @@ Each station publishes its recently-played tracks through a different mechanism:
 | Rádio Comercial | Static JSON log, one file per day | `https://radiocomercial.pt/now_playing_logs/json/radio-comercial_YYYY-MM-DD.json` |
 
 `radios.py` normalizes all three into a common `Track` record (station, date, hour, track, artist) and writes them to `radio_tracks.xlsx`, deduplicating against whatever is already in the file so it's safe to run repeatedly.
+
+## Sample data
+
+| Station | Date | Hour | Track | Artist |
+|---|---|---|---|---|
+| RFM | 2026-09-09 | 07:02 | ILOVEITILOVEIT | Bella Kay |
+| Mega Hits | 2026-09-09 | 12:18 | Remedied | Flo |
+| Rádio Comercial | 2026-09-09 | 00:01 | Refuge | Dermot Kennedy |
 
 ## Requirements
 
@@ -61,3 +73,8 @@ Add a new instance of whichever fits, and append it to the `STATIONS` list.
 
 - Requests are rate-limited with a short delay between hourly calls to avoid hammering the stations' servers.
 - Some fields (e.g. Rádio Comercial's `MCR` block) can be `null` for a given track; the parser falls back to the always-present `ZENON` fields for title/artist.
+
+## License
+
+Code is licensed under the [MIT License](LICENSE). The collected data (song/artist/airtime facts) is not subject to copyright and is released into the public domain — use it freely, attribution appreciated but not required.
+
