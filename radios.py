@@ -1,6 +1,9 @@
 """Scraper for Portuguese radio "now playing" widgets (ASP.NET AJAX + JSON log endpoints)."""
 
+import atexit
+import csv
 import random
+import sys
 import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -9,12 +12,10 @@ from typing import Callable
 
 import requests
 from bs4 import BeautifulSoup
-from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Alignment, Font
 
-OUTPUT_FILE = Path("radio_tracks.xlsx")
-SHEET_NAME = "Tracks"
+OUTPUT_FILE = Path("radio_tracks.csv")
 COLUMNS = ["Station", "Date", "Hour", "Track", "Artist"]
+LOCK_FILE = Path("radios.lock")
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -31,7 +32,7 @@ class Track:
     artist: str
 
     def as_row(self) -> list:
-        return [self.station, self.day, self.hour, self.title, self.artist]
+        return [self.station, str(self.day), self.hour, self.title, self.artist]
 
     def dedup_key(self) -> tuple:
         return (self.station, str(self.day), self.hour, self.title, self.artist)
@@ -155,47 +156,54 @@ def parse_megahits(html: str) -> list[tuple[str, str, str]]:
     return results
 
 
-# --- Excel output -----------------------------------------------------------
+# --- CSV output -----------------------------------------------------------
 
-def load_or_create_workbook():
-    if OUTPUT_FILE.exists():
-        wb = load_workbook(OUTPUT_FILE)
-        ws = wb[SHEET_NAME]
-        existing = {
-            (row[0], row[1].strftime("%Y-%m-%d") if hasattr(row[1], "strftime") else str(row[1]), *row[2:])
-            for row in ws.iter_rows(min_row=2, values_only=True)
-        }
-        return wb, ws, existing
+def load_existing_keys() -> set:
+    """Read existing rows to avoid duplicates. Returns an empty set if the file doesn't exist yet."""
+    if not OUTPUT_FILE.exists():
+        return set()
 
-    wb = Workbook()
-    ws = wb.active
-    ws.title = SHEET_NAME
-    ws.append(COLUMNS)
-    for cell in ws[1]:
-        cell.font = Font(name="Arial", bold=True)
-        cell.alignment = Alignment(horizontal="center")
-    return wb, ws, set()
+    with open(OUTPUT_FILE, "r", newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader, None)  # skip header
+        return {tuple(row) for row in reader}
 
 
 def append_tracks(tracks: list[Track]) -> int:
-    wb, ws, existing = load_or_create_workbook()
+    existing = load_existing_keys()
+    file_exists = OUTPUT_FILE.exists()
 
-    added = 0
-    for track in tracks:
-        if track.dedup_key() in existing:
-            continue
-        ws.append(track.as_row())
-        ws.cell(row=ws.max_row, column=2).number_format = "DD/MM/YYYY"
-        for col in range(1, len(COLUMNS) + 1):
-            ws.cell(row=ws.max_row, column=col).font = Font(name="Arial")
-        existing.add(track.dedup_key())
-        added += 1
+    new_rows = [t.as_row() for t in tracks if t.dedup_key() not in existing]
 
-    for col, width in zip("ABCDE", [12, 12, 8, 35, 30]):
-        ws.column_dimensions[col].width = width
+    with open(OUTPUT_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(COLUMNS)
+        writer.writerows(new_rows)
 
-    wb.save(OUTPUT_FILE)
-    return added
+    return len(new_rows)
+
+
+# --- Concurrency guard ---------------------------------------------------
+
+def acquire_lock():
+    """Prevent two instances from running at once and racing on the CSV file.
+
+    If the lock file already exists, another run is assumed to be in
+    progress and this process exits. The lock is released automatically
+    on normal exit via atexit, but can be left behind if the process is
+    killed forcefully (SIGKILL) — delete radios.lock by hand if that
+    ever happens and you're sure no instance is actually running.
+    """
+    if LOCK_FILE.exists():
+        print(f"Lock file {LOCK_FILE} already exists — another run seems to be in progress. Exiting.")
+        sys.exit(1)
+    LOCK_FILE.touch()
+    atexit.register(release_lock)
+
+
+def release_lock():
+    LOCK_FILE.unlink(missing_ok=True)
 
 
 # --- Station configs --------------------------------------------------
@@ -235,6 +243,8 @@ STATIONS = [RFM, MEGA_HITS, RADIO_COMERCIAL]
 
 
 if __name__ == "__main__":
+    acquire_lock()
+
     total_added = 0
     for station in STATIONS:
         tracks = station.fetch_full_day(day_keyword="yesterday")

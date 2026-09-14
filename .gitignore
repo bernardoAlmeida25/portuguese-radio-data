@@ -1,6 +1,8 @@
+# macOS
+.DS_Store
+
 # Virtual environment
 .venv/
-.DS_Store
 
 # Tool cache
 .ruff_cache/
@@ -8,7 +10,11 @@
 # LibreOffice/Excel lock files (created while the file is open locally)
 .~lock.*#
 
+# Scraper's own concurrency lock file
+radios.lock
+
 # Scraper output — generated data, not source
+radio_tracks.xlsx
 
 # Python
 __pycache__/
@@ -16,4 +22,3 @@ __pycache__/
 
 # Environment/secrets, if any (e.g. API keys)
 .env
-.DS_Store
