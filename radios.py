@@ -13,9 +13,16 @@ from typing import Callable
 import requests
 from bs4 import BeautifulSoup
 
-OUTPUT_FILE = Path("radio_tracks.csv")
+OUTPUT_DIR = Path("data")
 COLUMNS = ["Station", "Date", "Hour", "Track", "Artist"]
 LOCK_FILE = Path("radios.lock")
+
+
+def output_file_for(day: date) -> Path:
+    """One CSV per calendar month, e.g. data/radio_tracks_2026-09.csv."""
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    return OUTPUT_DIR / f"radio_tracks_{day.strftime('%Y-%m')}.csv"
+
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -158,30 +165,41 @@ def parse_megahits(html: str) -> list[tuple[str, str, str]]:
 
 # --- CSV output -----------------------------------------------------------
 
-def load_existing_keys() -> set:
+def load_existing_keys(path: Path) -> set:
     """Read existing rows to avoid duplicates. Returns an empty set if the file doesn't exist yet."""
-    if not OUTPUT_FILE.exists():
+    if not path.exists():
         return set()
 
-    with open(OUTPUT_FILE, "r", newline="", encoding="utf-8") as f:
+    with open(path, "r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
         next(reader, None)  # skip header
         return {tuple(row) for row in reader}
 
 
 def append_tracks(tracks: list[Track]) -> int:
-    existing = load_existing_keys()
-    file_exists = OUTPUT_FILE.exists()
+    """Group tracks by month (from Track.day) and append each group to its
+    own monthly file, so a run spanning a month boundary (rare, but possible
+    around midnight on the 1st) still lands in the right files."""
+    by_month: dict[Path, list[Track]] = {}
+    for t in tracks:
+        by_month.setdefault(output_file_for(t.day), []).append(t)
 
-    new_rows = [t.as_row() for t in tracks if t.dedup_key() not in existing]
+    total_added = 0
+    for path, month_tracks in by_month.items():
+        existing = load_existing_keys(path)
+        file_exists = path.exists()
 
-    with open(OUTPUT_FILE, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not file_exists:
-            writer.writerow(COLUMNS)
-        writer.writerows(new_rows)
+        new_rows = [t.as_row() for t in month_tracks if t.dedup_key() not in existing]
 
-    return len(new_rows)
+        with open(path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(COLUMNS)
+            writer.writerows(new_rows)
+
+        total_added += len(new_rows)
+
+    return total_added
 
 
 # --- Concurrency guard ---------------------------------------------------
