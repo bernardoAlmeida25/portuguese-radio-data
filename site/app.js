@@ -384,7 +384,7 @@
       type: "bar",
       data: {
         labels: STATIONS.map((st) => SHORT[st]),
-        datasets: o.categories.map((lab, i) => ({
+        datasets: stats.overlap.categories.map((lab, i) => ({
           label: jLabel(lab), data: STATIONS.map((st) => stats.overlap.plays_share[st][i] * 100), backgroundColor: oRamp[i],
         })),
       },
@@ -422,6 +422,7 @@
     const table = $("#results");
     const note = $("#q-note");
 
+    if (!haystack) return; // dados ainda não chegaram
     const q = plain(input.value.trim());
     if (q.length < 2) {
       table.hidden = true;
