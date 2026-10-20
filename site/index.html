@@ -13,104 +13,109 @@
 </head>
 <body>
   <header class="hero">
-    <h1>O que toca na rádio portuguesa</h1>
-    <p class="lede" id="lede">A carregar dados…</p>
-    <div class="presets" id="presets" role="group" aria-label="Escolher rádio"></div>
+    <h1 data-i18n="h1">O que toca na rádio portuguesa</h1>
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="pt" aria-pressed="true">Português</button>
+      <button type="button" data-lang="en" aria-pressed="false">English</button>
+    </div>
+    <p class="lede" id="lede" data-i18n="loading">A carregar dados…</p>
+    <div class="presets" id="presets" role="group" data-i18n-aria="chooseStation"></div>
   </header>
 
   <p class="error" id="error" hidden>
-    Não foi possível carregar os dados. Gera-os com <code>python site/build_stats.py</code> e abre a página
-    através de um servidor local (<code>python -m http.server</code> dentro da pasta <code>site</code>).
+    <span data-i18n="errorA">Não foi possível carregar os dados. Gera-os com</span> <code>python site/build_stats.py</code>
+    <span data-i18n="errorB">e abre a página através de um servidor local</span> (<code>python -m http.server</code>
+    <span data-i18n="errorC">dentro da pasta</span> <code>site</code>).
   </p>
 
   <main>
     <section id="top" aria-labelledby="h-top">
-      <h2 id="h-top">Mais tocadas</h2>
+      <h2 id="h-top" data-i18n="h2Top">Mais tocadas</h2>
       <p class="note" id="top-note"></p>
       <div class="legend" id="legend" hidden></div>
       <div class="two">
         <div>
-          <h3>Músicas</h3>
+          <h3 data-i18n="h3Songs">Músicas</h3>
           <ol class="ranking" id="list-songs"></ol>
         </div>
         <div>
-          <h3>Artistas</h3>
+          <h3 data-i18n="h3Artists">Artistas</h3>
           <ol class="ranking" id="list-artists"></ol>
         </div>
       </div>
     </section>
 
     <section id="day" aria-labelledby="h-day">
-      <h2 id="h-day">Um dia de rádio</h2>
-      <p class="note" id="day-note">Quantas músicas passam, em média, em cada hora do dia.</p>
-      <div class="chart tall"><canvas id="c-hourly" role="img" aria-label="Músicas por hora do dia em cada rádio"></canvas></div>
+      <h2 id="h-day" data-i18n="h2Day">Um dia de rádio</h2>
+      <p class="note" id="day-note" data-i18n="dayNote">Quantas músicas passam, em média, em cada hora do dia.</p>
+      <div class="chart tall"><canvas id="c-hourly" role="img" aria-label="Músicas por hora do dia em cada rádio" data-i18n-aria="ariaHourly"></canvas></div>
     </section>
 
     <section id="rotation" aria-labelledby="h-rot">
-      <h2 id="h-rot">Quão repetitiva é cada rádio?</h2>
+      <h2 id="h-rot" data-i18n="h2Rot">Quão repetitiva é cada rádio?</h2>
       <p class="note" id="rot-note"></p>
       <div class="scroll">
         <table class="facts" id="facts"></table>
       </div>
       <div class="two">
         <div>
-          <h3>Como se dividem as músicas</h3>
-          <p class="hint">Percentagem das músicas diferentes, por frequência de passagem.</p>
-          <div class="chart short"><canvas id="c-rot-songs" role="img" aria-label="Distribuição das músicas por frequência de rotação"></canvas></div>
+          <h3 data-i18n="h3RotSongs">Como se dividem as músicas</h3>
+          <p class="hint" data-i18n="hintRotSongs">Percentagem das músicas diferentes, por frequência de passagem.</p>
+          <div class="chart short"><canvas id="c-rot-songs" role="img" aria-label="Distribuição das músicas por frequência de rotação" data-i18n-aria="ariaRotSongs"></canvas></div>
         </div>
         <div>
-          <h3>Como se dividem as passagens</h3>
-          <p class="hint">Percentagem do total de passagens, pelos mesmos escalões.</p>
-          <div class="chart short"><canvas id="c-rot-plays" role="img" aria-label="Distribuição das passagens por frequência de rotação"></canvas></div>
+          <h3 data-i18n="h3RotPlays">Como se dividem as passagens</h3>
+          <p class="hint" data-i18n="hintRotPlays">Percentagem do total de passagens, pelos mesmos escalões.</p>
+          <div class="chart short"><canvas id="c-rot-plays" role="img" aria-label="Distribuição das passagens por frequência de rotação" data-i18n-aria="ariaRotPlays"></canvas></div>
         </div>
       </div>
     </section>
 
     <section id="overlap" aria-labelledby="h-over">
-      <h2 id="h-over">As rádios tocam o mesmo?</h2>
+      <h2 id="h-over" data-i18n="h2Over">As rádios tocam o mesmo?</h2>
       <p class="note" id="over-note"></p>
       <div class="two">
         <div>
-          <h3>Quanto do que passa é partilhado</h3>
-          <p class="hint">Percentagem das passagens de cada rádio, consoante a música também passe noutras.</p>
-          <div class="chart short"><canvas id="c-overlap" role="img" aria-label="Passagens por número de rádios que tocam a música"></canvas></div>
+          <h3 data-i18n="h3OverShare">Quanto do que passa é partilhado</h3>
+          <p class="hint" data-i18n="hintOverShare">Percentagem das passagens de cada rádio, consoante a música também passe noutras.</p>
+          <div class="chart short"><canvas id="c-overlap" role="img" aria-label="Passagens por número de rádios que tocam a música" data-i18n-aria="ariaOverlap"></canvas></div>
         </div>
         <div>
-          <h3>Músicas em comum</h3>
-          <p class="hint">Parte das músicas de uma rádio que também passam noutra.</p>
+          <h3 data-i18n="h3OverCommon">Músicas em comum</h3>
+          <p class="hint" data-i18n="hintCommon">Parte das músicas de uma rádio que também passam noutra.</p>
           <div class="scroll"><table class="matrix" id="matrix"></table></div>
         </div>
       </div>
       <div class="two">
         <div>
-          <h3>Passam nas três rádios</h3>
+          <h3 data-i18n="h3AllThree">Passam nas três rádios</h3>
           <ol class="ranking" id="list-all"></ol>
         </div>
         <div>
-          <h3>Só passam numa rádio</h3>
-          <div class="presets-mini" id="excl-tabs" role="group" aria-label="Escolher rádio"></div>
+          <h3 data-i18n="h3OnlyOne">Só passam numa rádio</h3>
+          <div class="presets-mini" id="excl-tabs" role="group" data-i18n-aria="chooseStation"></div>
           <ol class="ranking" id="list-excl"></ol>
         </div>
       </div>
     </section>
 
     <section id="calendar" aria-labelledby="h-cal">
-      <h2 id="h-cal">Dados recolhidos por dia</h2>
+      <h2 id="h-cal" data-i18n="h2Cal">Dados recolhidos por dia</h2>
       <p class="note" id="cal-note"></p>
-      <div class="chart"><canvas id="c-daily" role="img" aria-label="Passagens registadas por dia"></canvas></div>
+      <div class="chart"><canvas id="c-daily" role="img" aria-label="Passagens registadas por dia" data-i18n-aria="ariaDaily"></canvas></div>
     </section>
 
     <section id="search" aria-labelledby="h-search">
-      <h2 id="h-search">Procura uma música ou um artista</h2>
+      <h2 id="h-search" data-i18n="h2Search">Procura uma música ou um artista</h2>
       <label class="searchbox">
-        <span class="sr">Pesquisar</span>
-        <input id="q" type="search" placeholder="Por exemplo: Calema, Taylor Swift, Dracula" autocomplete="off">
+        <span class="sr" data-i18n="searchLabel">Pesquisar</span>
+        <input id="q" type="search" placeholder="Por exemplo: Calema, Taylor Swift, Dracula" data-i18n-placeholder="searchPh" autocomplete="off">
       </label>
       <p class="note" id="q-note">Escreve pelo menos dois caracteres.</p>
       <div class="scroll">
         <table class="results" id="results" hidden>
           <thead>
-            <tr><th>Música</th><th class="num" id="th-0"></th><th class="num" id="th-1"></th><th class="num" id="th-2"></th><th class="num">Total</th></tr>
+            <tr><th data-i18n="thSong">Música</th><th class="num" id="th-0"></th><th class="num" id="th-1"></th><th class="num" id="th-2"></th><th class="num" data-i18n="thTotal">Total</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -121,8 +126,8 @@
   <footer>
     <p id="foot-method"></p>
     <p>
-      Dados em domínio público, recolhidos todos os dias das páginas das rádios.
-      <a href="https://github.com/bernardoAlmeida25/portuguese-radio-data">Código e dados no GitHub</a>.
+      <span data-i18n="footData">Dados em domínio público, recolhidos todos os dias das páginas das rádios.</span>
+      <a href="https://github.com/bernardoAlmeida25/portuguese-radio-data" data-i18n="footLink">Código e dados no GitHub</a>.
     </p>
   </footer>
 
